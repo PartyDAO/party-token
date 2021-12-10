@@ -80,4 +80,22 @@ describe('DeprecationContract', async () => {
     it('CAN transferFrom after lockup', async () => {
         await expect(newToken.transferFrom(user.address, signers[0].address, eth(20))).to.emit(newToken, "Transfer");
     });
+
+    it('CAN deprecate after lockup', async () => {
+        // transfer 1k old tokens to user's address
+        await oldToken.transfer(user.address, eth(1000));
+
+        // approve deprecation contract to spend tokens
+        const data = encodeData(oldToken, 'approve', [deprecationContract.address, eth(1000)]);
+        await user.sendTransaction({
+            to: oldToken.address,
+            data,
+        });
+        await expect(deprecationContract.migrate(user.address)).to.emit(deprecationContract,"Migrated", [user.address, eth(1000)]);
+    });
+
+    it('CAN lockupTransfer after lockup', async () => {
+        await expect(newToken.lockupTransfer(signers[2].address, eth(20))).to.emit(newToken, "Transfer");
+    });
+
 });

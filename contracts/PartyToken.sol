@@ -72,7 +72,7 @@ contract PartyToken is ERC20VotesComp, Pausable {
     * Transfer function that can be called by PartyDAO multisig
     * or Deprecation Contract during the lockup period
     */
-    function lockupTransfer(address recipient, uint256 amount) public whenPaused returns (bool) {
+    function lockupTransfer(address recipient, uint256 amount) public returns (bool) {
         require(msg.sender == partyDAOMultisig || msg.sender == deprecationContract, "only partyDAO or deprecation contract");
         super.transfer(recipient, amount);
     }
