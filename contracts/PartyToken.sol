@@ -46,8 +46,7 @@ contract PartyToken is ERC20VotesComp, Pausable {
      * - the contract cannot be paused
      */
     function transfer(address recipient, uint256 amount) public override whenNotPaused returns (bool) {
-        _transfer(_msgSender(), recipient, amount);
-        return true;
+        super.transfer(recipient, amount);
     }
 
     /**
@@ -66,15 +65,7 @@ contract PartyToken is ERC20VotesComp, Pausable {
         address recipient,
         uint256 amount
     ) public override whenNotPaused returns (bool) {
-        _transfer(sender, recipient, amount);
-
-        uint256 currentAllowance = allowance(sender, _msgSender());
-        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
-        unchecked {
-            _approve(sender, _msgSender(), currentAllowance - amount);
-        }
-
-        return true;
+        super.transferFrom(sender, recipient, amount);
     }
 
     /**
@@ -83,7 +74,6 @@ contract PartyToken is ERC20VotesComp, Pausable {
     */
     function lockupTransfer(address recipient, uint256 amount) public whenPaused returns (bool) {
         require(msg.sender == partyDAOMultisig || msg.sender == deprecationContract, "only partyDAO or deprecation contract");
-        _transfer(_msgSender(), recipient, amount);
-        return true;
+        super.transfer(recipient, amount);
     }
 }
