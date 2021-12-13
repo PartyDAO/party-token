@@ -2,7 +2,6 @@
 pragma solidity 0.8.5;
 
 // ============ External Imports ============
-import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // ============ Internal Imports ============
 import {IPartyToken} from "./interfaces/IPartyToken.sol";
@@ -11,7 +10,7 @@ import {IPartyToken} from "./interfaces/IPartyToken.sol";
 DeprecateERC20
 by Anna Carroll
 */
-contract DeprecateERC20 is Initializable {
+contract DeprecateERC20 {
     // ============ Immutables ============
 
     IERC20 public immutable oldToken;
@@ -37,7 +36,8 @@ contract DeprecateERC20 is Initializable {
 
     // ======== Initializer =========
 
-    function initialize(address _newToken) external initializer {
+    function initialize(address _newToken) external {
+        require(address(newToken) == address(0), "already initialized");
         newToken = IPartyToken(_newToken);
     }
 

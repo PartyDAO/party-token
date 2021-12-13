@@ -26,7 +26,7 @@ describe('DeprecationContract', async () => {
   });
 
   it('Can only initialize deprecation contract once', async () => {
-    await expect(deprecationContract.initialize(user.address)).to.be.revertedWith("Initializable: contract is already initialized");
+    await expect(deprecationContract.initialize(user.address)).to.be.revertedWith("already initialized");
   });
 
   it('Fails to deprecate before approval is sent', async () => {
