@@ -66,7 +66,7 @@ contract PartyToken is ERC20VotesComp {
      * - `sender` must have a balance of at least `amount`.
      * - the caller must have allowance for ``sender``'s tokens of at least
      * `amount`.
-     * - the lockup period cannot be active unless being called from the deprecation contract
+     * - the lockup period cannot be active
      */
     function transferFrom(
         address sender,
