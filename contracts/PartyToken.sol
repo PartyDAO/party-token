@@ -73,7 +73,7 @@ contract PartyToken is ERC20VotesComp {
         address recipient,
         uint256 amount
     ) public override returns (bool) {
-        require(!lockupPeriod || msg.sender == deprecationContract, "lockup period");
+        require(!lockupPeriod, "lockup period");
         super.transferFrom(sender, recipient, amount);
     }
 

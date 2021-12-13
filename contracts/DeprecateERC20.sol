@@ -39,7 +39,6 @@ contract DeprecateERC20 is Initializable {
 
     function initialize(address _newToken) external initializer {
         newToken = IPartyToken(_newToken);
-        newToken.approve(address(this), 2**256 - 1);
     }
 
     // ======== External Functions =========
@@ -56,7 +55,7 @@ contract DeprecateERC20 is Initializable {
         // send total balance of old token to burn address
         oldToken.transferFrom(_tokenHolder, address(0), _oldBalance);
         // send balance of new token to caller
-        newToken.transferFrom(address(this), _tokenHolder, _oldBalance * exchangeRate);
+        newToken.transfer(_tokenHolder, _oldBalance * exchangeRate);
         // update total & emit event
         totalMigrated += _oldBalance;
         emit Migrated(_tokenHolder, _oldBalance);
