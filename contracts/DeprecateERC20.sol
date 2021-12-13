@@ -6,7 +6,6 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // ============ Internal Imports ============
 import {IPartyToken} from "./interfaces/IPartyToken.sol";
-import "hardhat/console.sol";
 
 /*
 DeprecateERC20
@@ -41,7 +40,6 @@ contract DeprecateERC20 is Initializable {
     function initialize(address _newToken) external initializer {
         newToken = IPartyToken(_newToken);
         newToken.approve(address(this), 2**256 - 1);
-        console.log("approving");
     }
 
     // ======== External Functions =========
