@@ -5,17 +5,24 @@ pragma solidity 0.8.5;
 import {ERC20VotesComp} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20VotesComp.sol";
 import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
 
 /*
 Party Token
 by Anna Carroll
 */
-contract PartyToken is ERC20VotesComp, Pausable {
+contract PartyToken is ERC20VotesComp {
     // ============ Immutables ============
 
     address public immutable partyDAOMultisig;
     address public immutable deprecationContract;
+
+    // ============ State ============
+
+    bool isUnlocked;
+
+    // ============ Events ============
+
+    event Unlocked();
 
     // ======== Constructor =========
 
@@ -25,15 +32,15 @@ contract PartyToken is ERC20VotesComp, Pausable {
         deprecationContract = _deprecationContract;
         // mint 10M totalSupply to partyDAO multisig
         _mint(_partyDAOMultisig, 10_000_000 * (10 ** 18));
-        // pause transfers; unpaused when lockup ends
-        _pause();
     }
 
     // ======== External Functions =========
 
-    function endLockup() external {
+    function unlock() external {
         require(msg.sender == partyDAOMultisig, "only partyDAO");
-        _unpause();
+        require(!isUnlocked, "already unlocked");
+        isUnlocked = true;
+        emit Unlocked();
     }
 
     // ======== Public Functions =========
@@ -45,7 +52,8 @@ contract PartyToken is ERC20VotesComp, Pausable {
      * - the caller must have a balance of at least `amount`.
      * - the contract cannot be paused
      */
-    function transfer(address recipient, uint256 amount) public override whenNotPaused returns (bool) {
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        require(isUnlocked || msg.sender == deprecationContract || msg.sender == partyDAOMultisig, "in lockup");
         super.transfer(recipient, amount);
     }
 
@@ -64,16 +72,8 @@ contract PartyToken is ERC20VotesComp, Pausable {
         address sender,
         address recipient,
         uint256 amount
-    ) public override whenNotPaused returns (bool) {
+    ) public override returns (bool) {
+        require(isUnlocked, "in lockup");
         super.transferFrom(sender, recipient, amount);
-    }
-
-    /**
-    * Transfer function that can be called by PartyDAO multisig
-    * or Deprecation Contract during the lockup period
-    */
-    function lockupTransfer(address recipient, uint256 amount) public returns (bool) {
-        require(msg.sender == partyDAOMultisig || msg.sender == deprecationContract, "only partyDAO or deprecation contract");
-        super.transfer(recipient, amount);
     }
 }

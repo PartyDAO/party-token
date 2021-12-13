@@ -3,8 +3,6 @@ pragma solidity 0.8.5;
 
 // ============ External Imports ============
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// ============ Internal Imports ============
-import {IPartyToken} from "./interfaces/IPartyToken.sol";
 
 /*
 DeprecateERC20
@@ -18,7 +16,7 @@ contract DeprecateERC20 {
 
     // ============  Public Storage ============
 
-    IPartyToken public newToken;
+    IERC20 public newToken;
     // amount of oldToken migrated; target = 25k (all crowdfund tokens)
     uint256 public totalMigrated;
 
@@ -38,7 +36,7 @@ contract DeprecateERC20 {
 
     function initialize(address _newToken) external {
         require(address(newToken) == address(0), "already initialized");
-        newToken = IPartyToken(_newToken);
+        newToken = IERC20(_newToken);
     }
 
     // ======== External Functions =========
@@ -55,7 +53,7 @@ contract DeprecateERC20 {
         // send total balance of old token to burn address
         oldToken.transferFrom(_tokenHolder, address(0), _oldBalance);
         // send balance of new token to caller
-        newToken.lockupTransfer(_tokenHolder, _oldBalance * exchangeRate);
+        newToken.transfer(_tokenHolder, _oldBalance * exchangeRate);
         // update total & emit event
         totalMigrated += _oldBalance;
         emit Migrated(_tokenHolder, _oldBalance);

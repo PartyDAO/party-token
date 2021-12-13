@@ -21,7 +21,7 @@ async function deployTestContractSetup(signer) {
 
   // MULTISIG TRANSACTIONS
   // transfer 700k new token to deprecation contract
-  await newToken.lockupTransfer(deprecationContract.address, eth(700000));
+  await newToken.transfer(deprecationContract.address, eth(700000));
 
   // transfer 25k old token to burn address
   await oldToken.transfer(ethers.constants.AddressZero, eth(25000));
