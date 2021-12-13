@@ -50,7 +50,8 @@ contract PartyToken is ERC20VotesComp {
      * Requirements:
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
-     * - the contract cannot be paused
+     * - the contract must be unlocked,
+     *   unless called by PartyDAO multisig or deprecation contract
      */
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         require(isUnlocked || msg.sender == deprecationContract || msg.sender == partyDAOMultisig, "in lockup");
@@ -66,7 +67,7 @@ contract PartyToken is ERC20VotesComp {
      * - `sender` must have a balance of at least `amount`.
      * - the caller must have allowance for ``sender``'s tokens of at least
      * `amount`.
-     * - the contract cannot be paused
+     * - the contract must be unlocked
      */
     function transferFrom(
         address sender,
