@@ -55,7 +55,6 @@ contract DeprecateERC20 is Initializable {
         uint256 _oldBalance = oldToken.balanceOf(_tokenHolder);
         // send total balance of old token to burn address
         oldToken.transferFrom(_tokenHolder, address(0), _oldBalance);
-        console.log("Old balance", _oldBalance);
         // send balance of new token to caller
         newToken.transferFrom(address(this), _tokenHolder, _oldBalance * exchangeRate);
         // update total & emit event
