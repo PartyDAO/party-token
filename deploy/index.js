@@ -3,7 +3,7 @@ const fs = require("fs");
 const dotenv = require('dotenv');
 const {getDeployedAddresses, writeDeployedAddresses} = require("./helpers");
 
-deployChain()
+deployContracts()
     .then(() => {
         console.log("DONE");
         process.exit(0);
@@ -28,40 +28,44 @@ function getDeployer(RPC_ENDPOINT, DEPLOYER_PRIVATE_KEY) {
     return deployer;
 }
 
-async function exampleDeploy() {
+async function deployContracts() {
     // load .env
     const {CHAIN_NAME, RPC_ENDPOINT, DEPLOYER_PRIVATE_KEY} = loadEnv();
 
     // load config.json
     const config = JSON.parse(fs.readFileSync(`./deploy/configs/${CHAIN_NAME}.json`));
-    const {configValue} = config;
-    if (!(configValue)) {
-        throw new Error("Must populate config");
+    const {oldPartyToken, exchangeRate, partyDAOMultisig} = config;
+    if (!(oldPartyToken && exchangeRate && partyDAOMultisig)) {
+        throw new Error("Must populate config with oldPartyToken, exchangeRate and partyDAOMultisig");
     }
 
     // setup deployer wallet
     const deployer = getDeployer(RPC_ENDPOINT, DEPLOYER_PRIVATE_KEY);
 
-    // Deploy contract
-    console.log(`Deploy EmptyContract to ${CHAIN_NAME}`);
-    const contract = await deploy(deployer,'EmptyContract', []);
-    console.log(`Deployed EmptyContract to ${CHAIN_NAME}: `, contract.address);
+    // deploy deprecation contract
+    console.log(`Deploy DeprecationContract to ${CHAIN_NAME}`);
+    const deprecationContract = await deploy(deployer,'DeprecateERC20', [oldPartyToken, exchangeRate]);
+    console.log(`Deployed DeprecationContract to ${CHAIN_NAME}: `, deprecationContract.address);
+
+    // deploy new Party token
+    console.log(`Deploy Party token to ${CHAIN_NAME}`);
+    const newToken = await deploy(deployer,'PartyToken', [partyDAOMultisig, deprecationContract.address]);
+    console.log(`Deployed Party token to ${CHAIN_NAME}: `, newToken.address);
+
+    // initialize deprecation contract with newToken address
+    await deprecationContract.initialize(newToken.address);
 
     // get the existing deployed addresses
     let {directory, filename, contractAddresses} = getDeployedAddresses(CHAIN_NAME);
 
     // update the deployed address
-    contractAddresses["emptyContract"] = contract.address;
+    contractAddresses["deprecationContract"] = deprecationContract.address;
+    contractAddresses["partyToken"] = newToken.address;
 
     // write the updated object
     writeDeployedAddresses(directory, filename, contractAddresses);
 
     console.log(`EmptyContract written to ${filename}`);
-}
-
-
-async function deployChain() {
-    await exampleDeploy();
 }
 
 async function deploy(wallet, name, args = []) {
