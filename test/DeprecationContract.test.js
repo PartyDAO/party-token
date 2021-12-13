@@ -12,6 +12,7 @@ describe('DeprecationContract', async () => {
   let oldToken, newToken, deprecationContract;
   const signers = provider.getWallets();
   const user = signers[1];
+  const lateUser = signers[2];
 
   before(async () => {
     // DEPLOY TEST CONTRACT SETUP
@@ -23,6 +24,8 @@ describe('DeprecationContract', async () => {
 
     // transfer 1k old tokens to user's address
     await oldToken.transfer(user.address, eth(1000));
+    // transfer 1k old tokens to old user to be migrated after lockup period ends
+    await oldToken.transfer(lateUser.address, eth(1000));
   });
 
   it('Can only initialize deprecation contract once', async () => {
@@ -90,4 +93,16 @@ describe('DeprecationContract', async () => {
     let deprecationBalanceNew = await newToken.balanceOf(deprecationContract.address);
     await expect(deprecationBalanceNew).to.equal(eth(672000));
   });
+
+  it("Can migrate after lockup period", async () => {
+    await expect(newToken.endLockup()).to.emit(newToken, "Unpaused");
+    const data = encodeData(oldToken, 'approve', [deprecationContract.address, eth(1000)]);
+    await lateUser.sendTransaction({
+      to: oldToken.address,
+      data,
+    });
+    await expect(deprecationContract.migrate(lateUser.address)).to.emit(deprecationContract,"Migrated", [lateUser.address, eth(1000)]);
+    const totalMigrated = await deprecationContract.totalMigrated();
+    await expect(totalMigrated).to.equal(eth(2000));
+  })
 });

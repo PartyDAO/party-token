@@ -36,13 +36,13 @@ describe('DeprecationContract', async () => {
     });
 
     it('Cannot transfer during lockup', async () => {
-        await expect(newToken.transfer(user.address, eth(20))).to.be.revertedWith("Pausable: paused");
+        await expect(newToken.transfer(user.address, eth(20))).to.be.revertedWith("lockup period");
 
         const data = encodeData(newToken, 'transfer', [signers[0].address, eth(20)]);
         await expect(user.sendTransaction({
             to: newToken.address,
             data,
-        })).to.be.revertedWith("Pausable: paused");
+        })).to.be.revertedWith("lockup period");
     });
 
     it('Cannot transferFrom during lockup', async () => {
@@ -51,7 +51,7 @@ describe('DeprecationContract', async () => {
             to: newToken.address,
             data,
         });
-        await expect(newToken.transferFrom(user.address, signers[0].address, eth(20))).to.be.revertedWith("Pausable: paused");
+        await expect(newToken.transferFrom(user.address, signers[0].address, eth(20))).to.be.revertedWith("lockup period");
     });
 
     it('CAN lockupTransfer during lockup', async () => {
@@ -63,7 +63,7 @@ describe('DeprecationContract', async () => {
     });
 
     it('Cannot call end lockup twice', async () => {
-        await expect(newToken.endLockup()).to.be.revertedWith("Pausable: not paused");
+        await expect(newToken.endLockup()).to.be.revertedWith("already unlocked");
     });
 
     it('CAN transfer after lockup', async () => {

@@ -6,6 +6,7 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // ============ Internal Imports ============
 import {IPartyToken} from "./interfaces/IPartyToken.sol";
+import "hardhat/console.sol";
 
 /*
 DeprecateERC20
@@ -39,6 +40,8 @@ contract DeprecateERC20 is Initializable {
 
     function initialize(address _newToken) external initializer {
         newToken = IPartyToken(_newToken);
+        newToken.approve(address(this), 2**256 - 1);
+        console.log("approving");
     }
 
     // ======== External Functions =========
@@ -54,8 +57,9 @@ contract DeprecateERC20 is Initializable {
         uint256 _oldBalance = oldToken.balanceOf(_tokenHolder);
         // send total balance of old token to burn address
         oldToken.transferFrom(_tokenHolder, address(0), _oldBalance);
+        console.log("Old balance", _oldBalance);
         // send balance of new token to caller
-        newToken.lockupTransfer(_tokenHolder, _oldBalance * exchangeRate);
+        newToken.transferFrom(address(this), _tokenHolder, _oldBalance * exchangeRate);
         // update total & emit event
         totalMigrated += _oldBalance;
         emit Migrated(_tokenHolder, _oldBalance);
