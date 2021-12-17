@@ -74,7 +74,7 @@ contract PartyToken is ERC20VotesComp {
         address recipient,
         uint256 amount
     ) public override returns (bool) {
-        require(isUnlocked, "in lockup");
+        require(isUnlocked || sender == partyDAOMultisig, "in lockup");
         super.transferFrom(sender, recipient, amount);
     }
 }
