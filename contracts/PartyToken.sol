@@ -26,7 +26,7 @@ contract PartyToken is ERC20VotesComp {
 
     // ======== Constructor =========
 
-    constructor(address _partyDAOMultisig, address _deprecationContract) ERC20("Party", "PARTY") ERC20Permit("Party") {
+    constructor(address _partyDAOMultisig, address _deprecationContract) ERC20("PartyDAO", "PARTY") ERC20Permit("PartyDAO") {
         // set partyDAO multisig & deprecation contract addresses
         partyDAOMultisig = _partyDAOMultisig;
         deprecationContract = _deprecationContract;

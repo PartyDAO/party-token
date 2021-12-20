@@ -1,3 +1,5 @@
 {
-  "chain": "mainnet"
+  "chain": "mainnet",
+  "deprecationContract": "0x6505d179b3e9178f56465C1b8e686a01C488Bb82",
+  "partyToken": "0x381b31b3905b6D1175Da9d216A7581023F1D6145"
 }
