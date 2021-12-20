@@ -11,7 +11,7 @@ async function deployTestContractSetup(signer) {
   const oldToken = await deploy("TestCrowdfundERC20")
 
   // deploy deprecation contract
-  const deprecationContract = await deploy("DeprecateERC20", [oldToken.address, 28])
+  const deprecationContract = await deploy("DeprecateERC20", [oldToken.address, 280])
 
   // deploy new Party token
   const newToken = await deploy("PartyToken", [signer.address, deprecationContract.address]);
@@ -20,8 +20,8 @@ async function deployTestContractSetup(signer) {
   await deprecationContract.initialize(newToken.address);
 
   // MULTISIG TRANSACTIONS
-  // transfer 700k new token to deprecation contract
-  await newToken.transfer(deprecationContract.address, eth(700000));
+  // transfer 7M new token to deprecation contract
+  await newToken.transfer(deprecationContract.address, eth(7000000));
 
   // transfer 25k old token to burn address
   await oldToken.transfer(ethers.constants.AddressZero, eth(25000));

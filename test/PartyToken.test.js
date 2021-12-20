@@ -25,6 +25,11 @@ describe('PartyToken', async () => {
         await oldToken.transfer(user.address, eth(1000));
     });
 
+    it('Has 100M supply', async () => {
+        const totalSupply = await newToken.totalSupply();
+        expect(totalSupply).to.equal(eth(100000000));
+    });
+
     it('Can deprecate during lockup', async () => {
         // approve deprecation contract to spend tokens
         const data = encodeData(oldToken, 'approve', [deprecationContract.address, eth(1000)]);

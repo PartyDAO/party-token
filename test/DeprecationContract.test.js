@@ -61,7 +61,7 @@ describe('DeprecationContract', async () => {
 
     // deprecation contract has 700k new tokens
     let deprecationBalanceNew = await newToken.balanceOf(deprecationContract.address);
-    await expect(deprecationBalanceNew).to.equal(eth(700000));
+    await expect(deprecationBalanceNew).to.equal(eth(7000000));
   });
 
   it('Deprecates successfully', async () => {
@@ -78,16 +78,16 @@ describe('DeprecationContract', async () => {
     let userBalanceOld = await oldToken.balanceOf(user.address);
     await expect(userBalanceOld).to.equal(0);
 
-    // user has 28k new tokens
+    // user has 280k new tokens
     let userBalanceNew = await newToken.balanceOf(user.address);
-    await expect(userBalanceNew).to.equal(eth(28000));
+    await expect(userBalanceNew).to.equal(eth(280000));
 
     // burn address has 1k more old tokens
     let burnBalanceOld = await oldToken.balanceOf(ethers.constants.AddressZero);
     await expect(burnBalanceOld).to.equal(eth(26000));
 
-    // deprecation contract has 28k less new tokens
+    // deprecation contract has 280k less new tokens
     let deprecationBalanceNew = await newToken.balanceOf(deprecationContract.address);
-    await expect(deprecationBalanceNew).to.equal(eth(672000));
+    await expect(deprecationBalanceNew).to.equal(eth(6720000));
   });
 });
