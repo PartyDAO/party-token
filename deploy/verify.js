@@ -14,23 +14,26 @@ async function verify() {
 
     // load config
     const config = JSON.parse(fs.readFileSync(`./deploy/configs/${CHAIN_NAME}.json`));
-    const {configValue} = config;
-    if (!(configValue)) {
-        throw new Error("Must populate config");
+    const {oldPartyToken, exchangeRate, partyDAOMultisig} = config;
+    if (!(oldPartyToken && exchangeRate && partyDAOMultisig)) {
+        throw new Error("Must populate config with oldPartyToken, exchangeRate and partyDAOMultisig");
     }
 
     // load deployed contracts
     const {contractAddresses} = getDeployedAddresses(CHAIN_NAME);
-    const {emptyContract} = contractAddresses;
-    if (!emptyContract) {
-        throw new Error("No deployed Empty Contract for this chain");
+    const {deprecationContract, partyToken} = contractAddresses;
+    if (!(deprecationContract && partyToken)) {
+        throw new Error("No deployed deprecationContract & partyToken for this chain");
     }
 
     console.log(`Verifying ${CHAIN_NAME}`);
 
     // Verify Empty Contract
-    console.log(`Verify EmptyContract`);
-    await verifyContract(emptyContract, []);
+    console.log(`Verify deprecationContract`);
+    await verifyContract(deprecationContract, [oldPartyToken, exchangeRate]);
+
+    console.log(`Verify partyToken`);
+    await verifyContract(partyToken, [partyDAOMultisig, deprecationContract]);
 }
 
 /*
